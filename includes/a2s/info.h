@@ -108,7 +108,7 @@ A2S_INFO* a2s_info(char* host, char* port) {
     };
 
     size_t response_len;
-    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_INFO_CHALLENGE_START);
+    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_INFO_CHALLENGE_START, 4);
 
     A2S_INFO* info = a2s_info_deserialize(response, response_len);
     free(response);

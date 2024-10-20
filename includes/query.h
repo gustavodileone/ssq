@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <string.h>
+#include <poll.h>
 
 #include "a2s/types.h"
 
@@ -198,11 +199,11 @@ int query_is_challenge(char* response, size_t response_len) {
     return response[A2S_CHALLENGE_LENGTH] == A2S_CHALLENGE_CHAR;
 }
 
-char* query_request_cycle(char* host, char* port, char* request, size_t request_len, size_t* response_len, int challenge_start) {
+char* query_request_cycle(char* host, char* port, char* request, size_t request_len, size_t* response_len, int challenge_start, int challenge_offset) {
     int sockfd = query_connect(host, port);
 
     *response_len = PACKET_SIZE;
-    char* response = query_request(sockfd, request, request_len, response_len);
+    char* response = query_request(sockfd, request, request_len - challenge_offset, response_len);
     if(query_is_challenge(response, *response_len)) {
         memcpy(&request[challenge_start], &response[A2S_CHALLENGE_START], A2S_CHALLENGE_LENGTH);
         free(response);

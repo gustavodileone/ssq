@@ -53,7 +53,7 @@ A2S_RULES_LIST* a2s_rules(char* host, char* port) {
     };
 
     size_t response_len;
-    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_RULES_CHALLENGE_START);
+    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_RULES_CHALLENGE_START, 0);
 
     A2S_RULES_LIST* rules = a2s_rules_deserialize(response, response_len);
     free(response);

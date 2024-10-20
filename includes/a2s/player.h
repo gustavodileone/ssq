@@ -57,7 +57,7 @@ A2S_PLAYER_LIST* a2s_player(char* host, char* port) {
     };
 
     size_t response_len;
-    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_PLAYER_CHALLENGE_START);
+    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_PLAYER_CHALLENGE_START, 0);
 
     A2S_PLAYER_LIST* players = a2s_player_deserialize(response, response_len);
     free(response);
