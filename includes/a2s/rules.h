@@ -11,6 +11,7 @@
 #define A2S_RULES_HEADER 0x56
 #define A2S_RULES_REQUEST_LENGTH 9
 #define A2S_RULES_CHALLENGE_START (A2S_RULES_REQUEST_LENGTH - A2S_CHALLENGE_LENGTH)
+#define A2S_RULES_CHALLENGE_OFFSET 0
 
 typedef struct A2S_RULE {
     char* name;
@@ -53,7 +54,8 @@ A2S_RULES_LIST* a2s_rules(char* host, char* port) {
     };
 
     size_t response_len;
-    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_RULES_CHALLENGE_START, 0);
+    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_RULES_CHALLENGE_START, A2S_RULES_CHALLENGE_OFFSET);
+    if(response == NULL) return NULL;
 
     A2S_RULES_LIST* rules = a2s_rules_deserialize(response, response_len);
     free(response);

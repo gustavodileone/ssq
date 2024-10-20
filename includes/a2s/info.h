@@ -15,6 +15,7 @@
 #define A2S_INFO_HEADER 0x54
 #define A2S_INFO_REQUEST 29
 #define A2S_INFO_CHALLENGE_START (A2S_INFO_REQUEST - A2S_CHALLENGE_LENGTH)
+#define A2S_INFO_CHALLENGE_OFFSET 4
 
 #define A2S_EDF_PORT 0x80
 #define A2S_EDF_STEAM_ID 0x10
@@ -108,7 +109,8 @@ A2S_INFO* a2s_info(char* host, char* port) {
     };
 
     size_t response_len;
-    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_INFO_CHALLENGE_START, 4);
+    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_INFO_CHALLENGE_START, A2S_INFO_CHALLENGE_OFFSET);
+    if(response == NULL) return NULL;
 
     A2S_INFO* info = a2s_info_deserialize(response, response_len);
     free(response);

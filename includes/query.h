@@ -117,10 +117,25 @@ char* query_wrapper_recv(int sockfd, size_t* response_len) {
         exit(EXIT_FAILURE);
     }
 
-    *response_len = recv(sockfd, response, *response_len, 0);
-    if(*response_len == -1) {
-        perror("query_request():");
+    struct pollfd fds;
+    fds.fd = sockfd;
+    fds.events = POLLIN;
+
+    int res = poll(&fds, 1, REQUEST_TIMEOUT);
+    if(res <= 0) {
+        if(res == 0) {
+            printf("TIMEOUT\n");
+            return NULL;
+        }
+
+        perror("poll");
         exit(EXIT_FAILURE);
+    } else {
+        *response_len = recv(sockfd, response, *response_len, 0);
+        if(*response_len == -1) {
+            perror("query_request():");
+            exit(EXIT_FAILURE);
+        }
     }
 
     return response;
@@ -155,7 +170,8 @@ char* query_request(int sockfd, char* request, size_t request_len, size_t* respo
     query_wrapper_send(sockfd, request, request_len);
 
     char* response = query_wrapper_recv(sockfd, response_len);
-    if(!query_is_split(response)) return response;
+    if(response == NULL || !query_is_split(response)) 
+        return response;
 
     PACKET* first_packet = query_packet_deserialize(response, *response_len);
     free(response);
@@ -175,6 +191,8 @@ char* query_request(int sockfd, char* request, size_t request_len, size_t* respo
         size_t packet_response_len = PACKET_SIZE;
 
         response = query_wrapper_recv(sockfd, &packet_response_len);
+        if(response == NULL) return NULL;
+
         total_response += packet_response_len;
 
         PACKET* packet = query_packet_deserialize(response, packet_response_len);
@@ -204,12 +222,15 @@ char* query_request_cycle(char* host, char* port, char* request, size_t request_
 
     *response_len = PACKET_SIZE;
     char* response = query_request(sockfd, request, request_len - challenge_offset, response_len);
+    if(response == NULL) return NULL;
+
     if(query_is_challenge(response, *response_len)) {
         memcpy(&request[challenge_start], &response[A2S_CHALLENGE_START], A2S_CHALLENGE_LENGTH);
         free(response);
         
         *response_len = PACKET_SIZE;
         response = query_request(sockfd, request, request_len, response_len);
+        if(response == NULL) return NULL;
     }
 
     close(sockfd);

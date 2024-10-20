@@ -11,6 +11,7 @@
 #define A2S_PLAYER_HEADER 0x55
 #define A2S_PLAYER_REQUEST_LENGTH 9
 #define A2S_PLAYER_CHALLENGE_START (A2S_PLAYER_REQUEST_LENGTH - A2S_CHALLENGE_LENGTH)
+#define A2S_PLAYER_CHALLENGE_OFFSET 0
 
 typedef struct A2S_PLAYER {
     int8_t index;
@@ -57,7 +58,8 @@ A2S_PLAYER_LIST* a2s_player(char* host, char* port) {
     };
 
     size_t response_len;
-    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_PLAYER_CHALLENGE_START, 0);
+    char* response = query_request_cycle(host, port, request, sizeof(request), &response_len, A2S_PLAYER_CHALLENGE_START, A2S_PLAYER_CHALLENGE_OFFSET);
+    if(response == NULL) return NULL;
 
     A2S_PLAYER_LIST* players = a2s_player_deserialize(response, response_len);
     free(response);
