@@ -1,6 +1,6 @@
 # Fetch SSQ
 
-Simple program that fetches [SSQ](https://developer.valvesoftware.com/wiki/Server_queries) (Server Query Protocol) information and displays on the terminal.
+Simple program that fetches [SSQ](https://developer.valvesoftware.com/wiki/Server_queries) (Source Server Query) information and displays on the terminal.
 
 My goal with this was really just practice network programming in linux with C.
 
